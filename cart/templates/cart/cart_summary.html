@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="sri py-5">
+    <div class="container px-4 px-lg-5 my-5 text-center text-white">
+        <h1 class="display-4 fw-bolder">Shopping Cart</h1>
+        <p class="lead fw-normal text-white-50 mb-0">Your cart items</p>
+    </div>
+</header>
+
+<br>
+
+<div class="container">
+
+{% if cart_items %}
+    {% for item in cart_items %}
+    <div class="card mb-3 p-3">
+        <div class="row g-0">
+
+            <!-- image -->
+            <div class="col-md-4">
+                <img src="{{ item.product.image.url }}"
+                     class="img-fluid rounded-start"
+                     style="width:200px;">
+            </div>
+
+            <!-- details + buttons -->
+            <div class="col-md-8">
+                <h4>{{ item.product.name }}</h4>
+
+                <p>
+                    Price: ₹<span id="price-{{ item.product.id }}">{{ item.product.price }}</span>
+                </p>
+                <p>
+                    Line total:
+                    ₹<span id="total-{{ item.product.id }}">{{ item.total }}</span>
+                </p>
+
+                <!-- quantity controls -->
+                <div class="d-flex align-items-center mb-2">
+
+                    <button class="btn btn-outline-secondary btn-sm decrement"
+                            data-index="{{ item.product.id }}">-</button>
+
+                    <span id="qty-{{ item.product.id }}" class="mx-2 fw-bold">
+                        {{ item.qty }}
+                    </span>
+
+                    <button class="btn btn-outline-secondary btn-sm increment"
+                            data-index="{{ item.product.id }}">+</button>
+
+                    <button class="btn btn-secondary ms-3 update-cart"
+                            data-index="{{ item.product.id }}">
+                        Update
+                    </button>
+
+                    <button class="btn btn-danger ms-3 delete-product"
+                            data-index="{{ item.product.id }}">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <h3 class="text-center text-danger mt-5">
+        You haven't added any items yet.
+    </h3>
+{% endif %}
+
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- ===== SCRIPTS FOR DELETE / UPDATE / +/- ===== -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+    function updateLineTotal(productID) {
+        let price = parseFloat($('#price-' + productID).text());
+        let qty = parseInt($('#qty-' + productID).text());
+        let total = price * qty;
+        $('#total-' + productID).text(total);
+    }
+
+    // INCREMENT
+    $(document).on('click', '.increment', function(){
+        let productID = $(this).data('index');
+        let qty = parseInt($('#qty-' + productID).text());
+        qty++;
+        $('#qty-' + productID).text(qty);
+        updateLineTotal(productID);
+    });
+
+    // DECREMENT
+    $(document).on('click', '.decrement', function(){
+        let productID = $(this).data('index');
+        let qty = parseInt($('#qty-' + productID).text());
+        if (qty > 1) {
+            qty--;
+            $('#qty-' + productID).text(qty);
+            updateLineTotal(productID);
+        }
+    });
+    // UPDATE cart (AJAX)
+    $(document).on('click', '.update-cart', function (e) {
+        e.preventDefault();
+
+        let productID = $(this).data('index');
+        let qty = $('#qty-' + productID).text().trim();
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_update' %}",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                product_id: productID,
+                product_qty: qty,
+            },
+            success: function (response) {
+                console.log("UPDATED", response);
+                location.reload();
+            },
+            error: function (xhr) {
+                console.log("Update failed", xhr.responseText);
+            }
+        });
+    });
+
+
+    // DELETE cart item (AJAX)
+    $(document).on('click', '.delete-product', function (e) {
+        e.preventDefault();
+
+        let productID = $(this).data('index');
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_delete' %}",
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                product_id: productID,
+            },
+            success: function (response) {
+                console.log("DELETED", response);
+                location.reload();
+            },
+            error: function (xhr) {
+                console.log("Delete failed", xhr.responseText);
+            }
+        });
+    });
+
+</script>
+{% endblock %}

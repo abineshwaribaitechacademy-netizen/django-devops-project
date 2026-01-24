@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 text-center bg-light shadow-sm">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Welcome to Shoppy</h1>
+        <p class="lead text-muted">Discover amazing products with great prices</p>
+        <a href="#products" class="btn btn-dark btn-lg mt-3">Shop Now</a>
+    </div>
+</section>
+
+<div class="container py-5" id="products">
+    <h2 class="text-center mb-5">Our Products</h2>
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm h-100">
+
+                {% if product.is_sale %}
+                <span class="badge bg-danger position-absolute m-2">SALE</span>
+                {% endif %}
+
+                <img src="{{ product.image.url }}" class="card-img-top" style="height:250px; object-fit:cover;">
+
+                <div class="card-body text-center">
+                    <h5>{{ product.name }}</h5>
+
+                    {% if product.is_sale %}
+                    <p class="fw-bold text-danger">
+                        <strike>${{ product.price }}</strike> ${{ product.sale_price }}
+                    </p>
+                    {% else %}
+                    <p class="fw-bold">${{ product.price }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer text-center bg-white">
+                    <a href="{% url 'product' product.id %}" class="btn btn-outline-dark btn-sm">View</a>
+                    <button class="btn btn-outline-danger wishlist-btn" data-product="{{ product.id }}">
+                        ❤️ Wishlist
+                    </button>
+
+                    <a href="{% url 'cart_add' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+
+    $(document).on('click', '.add-wishlist-btn', function (e) {
+        e.preventDefault();
+
+        let product_id = $(this).val();
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'wishlist_add' %}",
+            data: {
+                product_id: product_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+            success: function (json) {
+                // Increase count in navbar
+                document.getElementById("wishlist_quantity").textContent = json.qty;
+
+                alert(json.message);
+            },
+            error: function () {
+                alert("Something went wrong!");
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,86 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+
+        <!-- BRAND -->
+        <a class="navbar-brand" href="{% url 'home' %}">Ecommerce</a>
+
+        <!-- MOBILE TOGGLER -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- NAV LINKS -->
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'about' %}">About</a>
+                </li>
+
+                <!-- END DROPDOWN -->
+
+            </ul>
+        </div>
+
+        <!-- CART BUTTON -->
+        <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark ms-3">
+            <i class="bi-cart-fill me-1"></i>
+            Cart
+            <span class="badge bg-dark text-white ms-1 rounded-pill">
+                {{ cart_count }}
+            </span>
+        </a>
+
+    </div>
+</nav>
+
+
+<!-- SECOND NAVBAR FOR USER AUTH -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#userNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="userNav">
+            <ul class="navbar-nav ms-auto">
+
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+                {% endif %}
+
+            </ul>
+            <li class="nav-item me-2">
+                <a href="{% url 'cart_summary' %}" class="btn btn-outline-light position-relative">
+                    🛒 Cart
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ cart_count }}
+                    </span>
+                </a>
+            </li>
+        </div>
+        <a href="{% url 'wishlist_summary' %}" class="btn btn-outline-dark ms-2">
+            ❤ Wishlist
+            <span id="wishlist_quantity" class="badge bg-danger ms-1">
+                {{ wishlist|length }}
+            </span>
+        </a>
+
+    </div>
+</nav>

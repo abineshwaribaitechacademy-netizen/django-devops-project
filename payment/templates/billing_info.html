@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<header class="bg-dark py-5">
+    <div class="container text-center text-white">
+        <h1>Billing Information</h1>
+    </div>
+</header>
+<br/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+
+            <!-- Shipping Info Display -->
+            <div class="card mb-4">
+                <div class="card-header">Shipping Info</div>
+                <div class="card-body">
+                    Name: {{ shipping_info.shipping_full_name }} <br/>
+                    Email: {{ shipping_info.shipping_email }} <br/>
+                    Address1: {{ shipping_info.shipping_address1 }} <br/>
+                    City: {{ shipping_info.shipping_city }} <br/>
+                    State: {{ shipping_info.shipping_state }} <br/>
+                    Country: {{ shipping_info.shipping_country }} <br/>
+                </div>
+            </div>
+
+            <!-- Billing Form -->
+            <form method="POST" action="{% url 'process_order' %}">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-header">Enter Your Card Details</div>
+                    <div class="card-body">
+                        {{ billing_form.as_p }}
+                    </div>
+                </div>
+                <br/>
+                <button class="btn btn-success w-100">Pay Now</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
