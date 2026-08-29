@@ -1,8 +1,20 @@
+
+# Python
 venv/
 .venv/
 __pycache__/
 *.pyc
+
+# Environment files
 .env
+
+# Django
 db.sqlite3
 staticfiles/
 media/
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
